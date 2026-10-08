@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Sandbox Demo: Sourcing AI Copilot Extension</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0b1120; color: #f8fafc; padding: 24px; min-height: 100vh; }
+    
+    .container { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+    header {
+      background: #1e293b;
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .title-group h1 { font-size: 20px; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+    .title-group p { font-size: 13px; color: #94a3b8; margin-top: 4px; }
+    .tag { font-size: 11px; padding: 4px 10px; border-radius: 9999px; background: #0284c720; color: #38bdf8; font-weight: 600; border: 1px solid #0284c740; }
+
+    .instructions {
+      background: #1e293b80;
+      border: 1px dashed #38bdf8;
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+    .instructions strong { color: #38bdf8; }
+
+    /* Mock Chat Screen */
+    .mock-chat-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 520px;
+    }
+
+    .chat-header {
+      padding: 14px 20px;
+      background: #0f172a;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .candidate-info { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 38px; height: 38px; border-radius: 50%; background: #0284c7; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; }
+    .candidate-name { font-size: 14px; font-weight: 600; }
+    .candidate-headline { font-size: 12px; color: #94a3b8; }
+
+    .chat-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #090d16;
+    }
+
+    .msg-group { display: flex; flex-direction: column; max-width: 75%; gap: 4px; }
+    .msg-group.incoming { align-self: flex-start; }
+    .msg-group.outgoing { align-self: flex-end; }
+
+    .msg-bubble {
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      line-height: 1.5;
+    }
+    .msg-group.incoming .msg-bubble {
+      background: #1e293b;
+      color: #f1f5f9;
+      border: 1px solid #334155;
+      border-bottom-left-radius: 4px;
+    }
+    .msg-group.outgoing .msg-bubble {
+      background: #0284c7;
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+    }
+    .msg-time { font-size: 10.5px; color: #64748b; padding: 0 4px; }
+    .msg-group.outgoing .msg-time { text-align: right; }
+
+    .chat-footer {
+      padding: 14px 20px;
+      background: #0f172a;
+      border-top: 1px solid #334155;
+      display: flex;
+      gap: 12px;
+    }
+    .chat-input {
+      flex: 1;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+    }
+    .chat-input:focus { border-color: #38bdf8; }
+    .send-btn {
+      background: #0284c7;
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Platform & Scenario Switcher (Task 10.1) */
+    .platform-switcher {
+      display: flex;
+      gap: 12px;
+    }
+    .platform-btn {
+      flex: 1;
+      padding: 12px 16px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .platform-btn:hover {
+      background: #273549;
+      color: #f1f5f9;
+      border-color: #475569;
+      transform: translateY(-1px);
+    }
+    .platform-btn.active {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      border-color: #38bdf8;
+      box-shadow: 0 4px 16px rgba(2, 132, 199, 0.45);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="title-group">
+        <h1><span>🌐</span> Sandbox Giả Lập: Sourcing AI Copilot Extension</h1>
+        <p>Môi trường test trực quan tính năng dịch Real-time 2 chiều & bóc tách ứng viên vào CRM</p>
+      </div>
+      <span class="tag">Prototype v1.0</span>
+    </header>
+
+    <div class="instructions">
+      <strong>✨ HƯỚNG DẪN TRẢI NGHIỆM SOURCING COPILOT TRỰC CHIẾN (SEAMLESS FLOW):</strong>
+      <ol style="margin-left: 20px; margin-top: 6px;">
+        <li><strong style="color: #38bdf8;">⚡ (Incoming) Tự động Dịch Tin Nhắn (Zero-Click) & Bóc Tách Deal Mở Rộng</strong>:
+          <ul style="margin-left: 18px; margin-top: 3px;">
+            <li>Tin nhắn tiếng Hàn / Nhật của ứng viên <strong>tự động dịch sang tiếng Việt tự nhiên</strong> ngay bên dưới (không cần bấm nút dịch).</li>
+            <li>Bấm nút <strong>[✨ Gợi ý & Bóc tách deal ▾]</strong> để mở rộng: <strong>4 Deal Badges</strong> (💰 Lương, 🛂 Visa, 🏠 Remote, ⏱️ Bắt đầu) và <strong>2 Kịch bản phản hồi gợi ý 1-chạm</strong>.</li>
+            <li>Bấm chọn bất kỳ kịch bản gợi ý nào ➔ Tự động dịch kính ngữ và điền thẳng vào ô chat kèm nút Hoàn tác sẵn sàng!</li>
+          </ul>
+        </li>
+        <li style="margin-top: 6px;"><strong style="color: #f59e0b;">✍️ (Outgoing) Soạn Tiếng Việt & Nút [✨ Dịch] + [↺ Hoàn tác] Cạnh Nút Gửi</strong>:
+          <ul style="margin-left: 18px; margin-top: 3px;">
+            <li>Gõ tiếng Việt bất kỳ vào ô chat bên dưới (VD: <em>"Chào bạn, bên mình hỗ trợ visa E-7 và hybrid 2 ngày/tuần nhé"</em>).</li>
+            <li><strong>Ngay sát bên trái nút [Gửi]</strong>, Extension gắn nút <strong>[✨ Dịch (🇰🇷 KO ▾)]</strong>.</li>
+            <li>Bấm nút <strong>[✨ Dịch]</strong> (hoặc nhấn <code>Ctrl + Shift + Enter</code>) ➔ Câu trong ô chat lập tức biến thành tiếng của ứng viên chuẩn kính ngữ công sở (존댓말/敬語).</li>
+            <li>➔ Xuất hiện ngay nút <strong>[↺ Hoàn tác]</strong> bên cạnh: Bấm vào là khôi phục lại câu tiếng Việt ban đầu để chỉnh sửa.</li>
+            <li>Sau khi rà soát xong, Recruiter tự tay nhấn nút <strong>[Gửi]</strong> hoặc Enter (<strong>Đảm bảo tuyệt đối INV-5: Human-in-the-loop</strong>).</li>
+          </ul>
+        </li>
+        <li style="margin-top: 6px;"><strong style="color: #cbd5e1;">🌐 Quản lý Ngôn ngữ theo Thread & Dock Panel CRM (Alt + S)</strong>:
+          <ul style="margin-left: 18px; margin-top: 3px;">
+            <li>Tự động nhận diện ngôn ngữ ứng viên theo từng cuộc hội thoại (Hàn, Nhật, Anh, Trung, Đức...). Click vào badge ngôn ngữ cạnh nút Dịch để đổi nhanh sang ngôn ngữ khác.</li>
+            <li>Mở Dock Panel đầy đủ với 3 Tabs (Dịch tin nhắn, Soạn phản hồi, Quản lý CRM).</li>
+          </ul>
+        </li>
+        <li style="margin-top: 6px;"><strong style="color: #34d399;">👤 (Task 8.3) Nút Nhỏ Góc Trên Cùng Bên Phải: Lưu Ứng Viên 1-Click Vào CRM</strong>:
+          <ul style="margin-left: 18px; margin-top: 3px;">
+            <li>Quan sát <strong>góc trên cùng bên phải màn hình</strong>: Xuất hiện nút bấm nhỏ sang trọng <strong>[👤 + Lưu vào CRM]</strong>.</li>
+            <li>Bấm vào nút ➔ Bung ra popover tiện lợi đã <strong>tự động bóc tách Tên và Profile URL</strong> từ trang web.</li>
+            <li>Chọn <strong>Vị trí Job đang tuyển</strong> (nạp tự động từ API Jobs), thêm ghi chú trao đổi ban đầu.</li>
+            <li>Bấm <strong>[💾 Lưu vào CRM (Lưu tạm 30 ngày)]</strong> (Tuân thủ hợp đồng INV-3).</li>
+            <li>➔ Báo thành công kèm nút <strong>[🔗 Mở hồ sơ trong CRM web app ↗]</strong> mở trực tiếp URL <code>http://localhost:3000/candidates/[id]</code>.</li>
+            <li>Nút góc trên tự động đổi sang <strong>[✓ Đã có trong CRM ↗]</strong> và <strong>đồng bộ 2 chiều tức thì với Tab 3</strong> trong Dock Panel!</li>
+            <li>Khi mở Dock Panel (Alt + S), nút góc trên tự động trượt mượt sang trái để không bao giờ bị che khuất.</li>
+          </ul>
+        <li style="margin-top: 6px;"><strong style="color: #10b981;">🔍 (Task 9.1) Tự Động Tra Cứu Hồ Sơ & Huy Hiệu [● ĐÃ CÓ TRONG CRM] Khi Mở Chat</strong>:
+          <ul style="margin-left: 18px; margin-top: 3px;">
+            <li>Khi mở tab chat (LinkedIn/Telegram/Demo), Extension <strong>tự động gửi Profile URL</strong> lên <code>/api/extension/candidate</code>.</li>
+            <li>Nếu <strong>ĐÃ CÓ TRONG CRM</strong>:</li>
+            <li>➔ Ngay trên đỉnh khung chat (Header) xuất hiện thanh Banner nổi bật với huy hiệu: <strong style="color: #34d399;">● ĐÃ CÓ TRONG CRM</strong> (chấm xanh ngọc pulse).</li>
+            <li>➔ Hiển thị đầy đủ: 👤 <strong>Tên ứng viên</strong> (Kim Min-soo), 💼 <strong>Job đang gắn</strong> (Senior Backend Engineer...), và 🏷️ <strong>Stage hiện tại chuẩn tiếng Việt</strong> (VD: <em>Đã liên hệ</em>, <em>Đã phản hồi</em>, <em>Quan tâm</em>, <em>Lưu tạm (30 ngày)</em>).</li>
+            <li>➔ Kèm nút tiện ích <strong>[🔗 Mở CRM ↗]</strong> mở trực tiếp hồ sơ chi tiết trên CRM web app.</li>
+            <li>➔ Nút nhỏ góc trên cùng bên phải cũng lập tức đồng bộ chuyển sang: <strong style="color: #34d399;">[● ĐÃ CÓ TRONG CRM]</strong>.</li>
+            <li>➔ Khi mở Dock Panel (Alt + S), Tab 3 chuyển ngay sang chế độ quản lý hồ sơ ứng viên với đầy đủ tín hiệu sẵn sàng và các nút chuyển Stage 1-click (Đã phản hồi, Quan tâm, Từ chối).</li>
+          </ul>
+        <li style="margin-top: 6px;"><strong style="color: #60a5fa;">⚡ (Task 9.2) Hệ Thống Tự Động Đồng Bộ 100% Vào CRM (Hoàn Toàn Ngầm - Zero-Click, Không Cần Bấm Nút)</strong>:
+          <ul style="margin-left: 18px; margin-top: 3px;">
+            <li><strong>Giao diện sạch sẽ 100%</strong>: <em>Hoàn toàn không hiển thị bất kỳ nút bấm hay checkbox thủ công nào trên khung chat.</em></li>
+            <li><strong>Tự động nhận diện & chuyển Stage "Có phản hồi"</strong>: Khi ứng viên gửi tin nhắn trả lời ➔ Hệ thống <strong>tự động cập nhật stage sang <em>Đã phản hồi (responded)</em></strong> trong CRM ngầm. Huy hiệu trên Header banner lập tức đổi sang <code>🏷️ ĐÃ PHẢN HỒI</code>.</li>
+            <li><strong>Tự động phát hiện khi đồng ý phỏng vấn ➔ Chuyển Stage "Quan tâm"</strong>: Khi ứng viên đồng ý phỏng vấn hoặc có ý định trao đổi tích cực (nhận diện qua AI & NLP) ➔ Hệ thống <strong>tự động chuyển stage sang <em>Quan tâm (interested)</em></strong> trong CRM. Huy hiệu đổi ngay sang <code>🏷️ QUAN TÂM</code>.</li>
+            <li><strong>Tự động ghi nhận tín hiệu hoạt động gần đây</strong>: Khi ứng viên tương tác chat ➔ Hệ thống <strong>tự động ghi nhận tín hiệu thị trường (recent_activity)</strong> vào hồ sơ CRM.</li>
+            <li><strong>Tự động lưu tóm tắt cuộc trò chuyện vào CRM Activity</strong>: Hệ thống <strong>tự động bóc tách ý định, deal và lưu tóm tắt cuộc trò chuyện vào Activity timeline của ứng viên</strong> mỗi khi có tin nhắn mới hoặc khi Recruiter gửi tin đi. <em>Recruiter hoàn toàn không cần bấm bất kỳ nút nào!</em></li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Platform & Scenario Switcher (Task 10.1) -->
+    <div class="platform-switcher">
+      <button class="platform-btn active" id="btn-scenario-linkedin" data-scenario="linkedin">
+        <span>👔</span> LinkedIn Web (Kim Min-soo 🇰🇷 · Đã có CRM)
+      </button>
+      <button class="platform-btn" id="btn-scenario-telegram" data-scenario="telegram">
+        <span>✈️</span> Telegram Web (Alexey Ivanov 🇷🇺 · Bóc tách Deal)
+      </button>
+      <button class="platform-btn" id="btn-scenario-newlead" data-scenario="newlead">
+        <span>🆕</span> Sourcing Mới (Elena Rostova 🇺🇦 · Test Lưu Lead)
+      </button>
+    </div>
+
+    <!-- Mock Chat Screen -->
+    <div class="mock-chat-card">
+      <div class="chat-header">
+        <div class="candidate-info">
+          <div class="avatar" id="candidate-avatar">KS</div>
+          <div>
+            <div class="candidate-name" id="candidate-name">Kim Min-soo (김민수) 🇰🇷</div>
+            <div class="candidate-headline" id="candidate-headline">Senior Backend Engineer (Golang & Kubernetes) | Ex-Kakao</div>
+          </div>
+        </div>
+        <div id="platform-status" style="font-size: 12px; color: #34d399; font-weight: 600;">● Active on LinkedIn</div>
+      </div>
+
+      <div class="chat-body" id="chat-body">
+        <!-- Message 1 -->
+        <div class="msg-group incoming">
+          <div class="msg-bubble">
+            안녕하세요! 메시지 주셔서 감사합니다. 제안해주신 베트남 IT 프로젝트에 관심이 있습니다. 혹시 비자(E-7/Work Permit) 지원과 사택 제공이 가능한지, 그리고 연봉 8000만원선에서 협의가 가능한지 알고 싶습니다.
+          </div>
+          <div class="msg-time">10:14 AM · Tiếng Hàn (Korean)</div>
+        </div>
+
+        <!-- Message 2 -->
+        <div class="msg-group incoming">
+          <div class="msg-bubble">
+            初めまして。プロジェクトの技術スタック（Go、AWS、Kubernetes）は私の専門領域と非常に一致しています。リモートワーク制度やオンコール手当について詳しく伺えますでしょうか？
+          </div>
+          <div class="msg-time">10:20 AM · Tiếng Nhật (Japanese)</div>
+        </div>
+      </div>
+
+      <div class="chat-footer">
+        <input type="text" id="chat-input" class="chat-input" placeholder="Ô chat nền tảng (LinkedIn / Telegram / Zalo)...">
+        <button class="send-btn" id="send-btn">Gửi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inject Content Script for Prototype Testing -->
+  <script src="content/content.js"></script>
+
+  <script>
+    const sendBtn = document.getElementById("send-btn");
+    const chatInput = document.getElementById("chat-input");
+    const chatBody = document.getElementById("chat-body");
+    const candAvatar = document.getElementById("candidate-avatar");
+    const candName = document.getElementById("candidate-name");
+    const candHeadline = document.getElementById("candidate-headline");
+    const platformStatus = document.getElementById("platform-status");
+
+    // Kịch bản kiểm thử E2E (Task 10.1: LinkedIn, Telegram tiếng Nga/Anh, New Lead)
+    const SCENARIOS = {
+      linkedin: {
+        platformStatus: "● Active on LinkedIn",
+        avatar: "KS",
+        name: "Kim Min-soo (김민수) 🇰🇷",
+        headline: "Senior Backend Engineer (Golang & Kubernetes) | Ex-Kakao",
+        profile: {
+          id: "cand-kim-min-soo-01",
+          displayName: "Kim Min-soo",
+          profileUrl: "https://www.linkedin.com/in/kim-min-soo",
+          jobTitle: "Senior Backend Engineer (Golang & Kubernetes)",
+          currentStage: "contacted",
+          readinessSignals: ["recent_activity", "cv_recently_updated"],
+          isNewLead: false,
+        },
+        messages: [
+          {
+            text: "안녕하세요! 메시지 주셔서 감사합니다. 제안해주신 베트남 IT 프로젝트에 관심이 있습니다. 혹시 비자(E-7/Work Permit) 지원과 사택 제공이 가능한지, 그리고 연봉 8000만원선에서 협의가 가능한지 알고 싶습니다.",
+            time: "10:14 AM · Tiếng Hàn (Korean)"
+          },
+          {
+            text: "初めまして。プロジェクトの技術スタック（Go、AWS、Kubernetes）は私の専門領域と非常に一致しています。リモートワーク制度やオンコール手当について詳しく伺えますでしょうか？",
+            time: "10:20 AM · Tiếng Nhật (Japanese)"
+          }
+        ]
+      },
+      telegram: {
+        platformStatus: "● Active on Telegram Web",
+        avatar: "AI",
+        name: "Alexey Ivanov (Алексей Иванов) 🇷🇺",
+        headline: "Staff AI/ML Engineer (Python, PyTorch & Distributed Systems) | Telegram: @alexey_tech_lead",
+        profile: {
+          id: "cand-alexey-ivanov-01",
+          displayName: "Alexey Ivanov",
+          profileUrl: "https://t.me/alexey_tech_lead",
+          jobTitle: "Staff AI/ML Engineer (Python & PyTorch)",
+          currentStage: "contacted",
+          readinessSignals: ["recent_activity"],
+          isNewLead: false,
+        },
+        messages: [
+          {
+            text: "Здравствуйте! Меня зовут Алексей Иванов. Спасибо за предложение по вакансии в сфере AI/ML. Меня интересует компенсация от $6,000 USD в месяц, формат удаленной работы (Full Remote) и визовая поддержка с релокацией. Готов обсудить детали на коротком созвоне в Zoom на этой неделе.",
+            time: "14:30 · Tiếng Nga (Russian)"
+          },
+          {
+            text: "Hello! I am also open to discussing the team structure, GPU cluster infrastructure and Kubernetes cluster setup beforehand if needed.",
+            time: "14:32 · Tiếng Anh (English)"
+          }
+        ]
+      },
+      newlead: {
+        platformStatus: "○ New Sourcing Profile",
+        avatar: "ER",
+        name: "Elena Rostova (Олена Ростова) 🇺🇦",
+        headline: "Senior Cloud & DevOps Architect (AWS, Terraform, Go) | Ex-Wargaming",
+        profile: {
+          id: "cand-elena-rostova",
+          displayName: "Elena Rostova",
+          profileUrl: "https://www.linkedin.com/in/elena-rostova-dev",
+          jobTitle: "Senior DevOps Architect",
+          isNewLead: true,
+        },
+        messages: [
+          {
+            text: "Hi there! I saw your post regarding the Cloud Infrastructure Lead position. I have 7+ years of experience with AWS and Terraform. Could you share the compensation range and remote policy?",
+            time: "09:15 AM · Tiếng Anh (English)"
+          }
+        ]
+      }
+    };
+
+    function loadScenario(scenarioKey) {
+      const sc = SCENARIOS[scenarioKey];
+      if (!sc) return;
+
+      // 1. Cập nhật profile giả lập
+      window.__CURRENT_SIMULATED_PROFILE__ = sc.profile;
+
+      // 2. Cập nhật DOM Chat Header
+      candAvatar.textContent = sc.avatar;
+      candName.textContent = sc.name;
+      candHeadline.textContent = sc.headline;
+      platformStatus.textContent = sc.platformStatus;
+
+      // 3. Cập nhật danh sách tin nhắn
+      chatBody.innerHTML = "";
+      sc.messages.forEach((msg) => {
+        const group = document.createElement("div");
+        group.className = "msg-group incoming";
+        group.innerHTML = `
+          <div class="msg-bubble">${msg.text}</div>
+          <div class="msg-time">${msg.time}</div>
+        `;
+        chatBody.appendChild(group);
+      });
+
+      // 4. Bắn sự kiện đồng bộ để Content Script tải lại ứng viên & gắn bản dịch
+      window.dispatchEvent(new CustomEvent("copilot:switch-scenario"));
+    }
+
+    // Switcher Click Handlers
+    document.querySelectorAll(".platform-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".platform-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const key = btn.dataset.scenario;
+        loadScenario(key);
+      });
+    });
+
+    // Chat Send Logic
+    sendBtn.addEventListener("click", () => {
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      const group = document.createElement("div");
+      group.className = "msg-group outgoing";
+      group.innerHTML = `
+        <div class="msg-bubble">${text}</div>
+        <div class="msg-time">Vừa xong · Đã gửi bởi Recruiter</div>
+      `;
+      chatBody.appendChild(group);
+      chatInput.value = "";
+      chatBody.scrollTop = chatBody.scrollHeight;
+    });
+
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendBtn.click();
+    });
+
+    // Thiết lập kịch bản ban đầu
+    window.__CURRENT_SIMULATED_PROFILE__ = SCENARIOS.linkedin.profile;
+  </script>
+</body>
+</html>

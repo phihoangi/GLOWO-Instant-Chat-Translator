@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chat Translator</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="popup-container">
+      <header class="header">
+        <div class="brand-icon" aria-hidden="true">🌐</div>
+        <div>
+          <h1>Chat Translator</h1>
+          <p>Dịch tin nhắn trên LinkedIn và WhatsApp</p>
+        </div>
+      </header>
+
+      <section class="field-group">
+        <label for="openai-key">OpenAI API key</label>
+        <input id="openai-key" type="password" autocomplete="off" placeholder="sk-…">
+        <p id="key-status" class="hint">Key được lưu trong Chrome trên máy này.</p>
+      </section>
+
+      <section class="field-group">
+        <label for="target-lang">Ngôn ngữ dịch tin đi</label>
+        <select id="target-lang">
+          <option value="ko">Tiếng Hàn</option>
+          <option value="ja">Tiếng Nhật</option>
+          <option value="en">Tiếng Anh</option>
+          <option value="zh">Tiếng Trung</option>
+          <option value="de">Tiếng Đức</option>
+          <option value="fr">Tiếng Pháp</option>
+          <option value="ru">Tiếng Nga</option>
+          <option value="es">Tiếng Tây Ban Nha</option>
+        </select>
+      </section>
+
+      <p class="privacy-note">Tin nhắn chỉ được gửi tới OpenAI khi bạn bấm dịch. Extension không cần CRM hay server local.</p>
+
+      <div id="toast-msg" class="toast" role="status" aria-live="polite"></div>
+      <div class="actions">
+        <button id="remove-key" class="secondary-btn" type="button">Xóa key</button>
+        <button id="save-btn" class="primary-btn" type="button">Lưu cài đặt</button>
+      </div>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
