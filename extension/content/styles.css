@@ -1,0 +1,19 @@
+.chat-translator-incoming {
+  all: initial;
+  display: block !important;
+  margin: 6px 0 8px !important;
+  max-width: 100% !important;
+  clear: both !important;
+}
+
+.chat-translator-preview {
+  all: initial;
+  display: block !important;
+  position: fixed !important;
+  z-index: 2147483640 !important;
+}
+
+.chat-translator-incoming[hidden],
+.chat-translator-preview[hidden] {
+  display: none !important;
+}

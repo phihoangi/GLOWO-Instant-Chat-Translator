@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "Chat Translator",
+  "version": "1.3.10",
+  "description": "Dịch chat đa nền tảng và xem trước bản dịch khi gõ bình luận LinkedIn; nhấn Tab để thay nội dung.",
+  "icons": {
+    "16": "icons/logo.png",
+    "32": "icons/logo.png",
+    "48": "icons/logo.png",
+    "128": "icons/logo.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icons/logo.png",
+      "32": "icons/logo.png",
+      "48": "icons/logo.png",
+      "128": "icons/logo.png"
+    },
+    "default_popup": "popup/popup.html",
+    "default_title": "Chat Translator"
+  },
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://api.openai.com/*",
+    "https://*.linkedin.com/*",
+    "https://web.whatsapp.com/*",
+    "https://*.facebook.com/*",
+    "https://*.messenger.com/*",
+    "https://chat.zalo.me/*",
+    "https://web.telegram.org/*",
+    "https://teams.microsoft.com/*",
+    "https://teams.live.com/*",
+    "https://teams.cloud.microsoft/*",
+    "https://discord.com/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.linkedin.com/*",
+        "https://web.whatsapp.com/*",
+        "https://*.facebook.com/*",
+        "https://*.messenger.com/*",
+        "https://chat.zalo.me/*",
+        "https://web.telegram.org/*",
+        "https://teams.microsoft.com/*",
+        "https://teams.live.com/*",
+        "https://teams.cloud.microsoft/*",
+        "https://discord.com/*"
+      ],
+      "js": ["shared/settings.js", "shared/dom.js", "shared/platforms.js", "content/diagnostics.js", "content/content.js"],
+      "css": ["content/styles.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

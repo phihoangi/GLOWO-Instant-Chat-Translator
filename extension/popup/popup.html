@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chat Translator</title>
+    <link rel="stylesheet" href="popup.css">
+    <link rel="icon" type="image/png" href="../icons/logo.png">
+  </head>
+  <body>
+    <main>
+      <header class="header">
+        <img class="brand-mark" src="../icons/logo.png" width="40" height="40" alt="" aria-hidden="true">
+        <div class="brand-copy"><h1>GLOWO</h1><p title="Instant Chat Translator">Instant Chat Translator</p></div>
+        <label class="switch master-switch" title="Bật hoặc tắt extension">
+          <input id="enabled" type="checkbox" aria-label="Bật dịch tự động" checked>
+          <span class="switch-track" aria-hidden="true"></span>
+        </label>
+      </header>
+
+      <form id="settings-form">
+        <div class="status-line"><span id="status-dot" class="status-dot" aria-hidden="true"></span><span id="extension-status" role="status">Đang đọc cài đặt…</span></div>
+
+        <section class="translation-card" aria-labelledby="incoming-title">
+          <div class="card-header">
+            <img class="direction-icon" src="../icons/logo.png" width="30" height="30" alt="" aria-hidden="true">
+            <div><h2 id="incoming-title">Incoming message</h2></div>
+            <label class="switch">
+              <input id="auto-incoming" type="checkbox" aria-label="Tự dịch tin đã gửi và nhận" checked>
+              <span class="switch-track" aria-hidden="true"></span>
+            </label>
+          </div>
+          <div class="language-row"><label class="select-label" for="incoming-lang">Dịch sang</label>
+          <select id="incoming-lang"><option value="vi">Tiếng Việt</option><option value="en">Tiếng Anh</option></select></div>
+          <div class="history-actions"><button id="translate-all" type="button" disabled>Dịch lại tất cả</button></div>
+          <p id="chat-status" class="chat-status" role="status" hidden></p>
+          <button id="diagnose-chat" class="text-button diagnostic-button" type="button" hidden>Kiểm tra nhận diện</button>
+        </section>
+
+        <section class="translation-card" aria-labelledby="outgoing-title">
+          <div class="card-header">
+            <img class="direction-icon" src="../icons/logo.png" width="30" height="30" alt="" aria-hidden="true">
+            <div><h2 id="outgoing-title">Outgoing message</h2></div>
+            <label class="switch">
+              <input id="auto-outgoing" type="checkbox" aria-label="Dịch bản nháp khi gõ" checked>
+              <span class="switch-track" aria-hidden="true"></span>
+            </label>
+          </div>
+          <div class="language-row"><label class="select-label" for="outgoing-lang">Dịch sang</label>
+          <select id="outgoing-lang"></select></div>
+          <p class="keyboard-hint">Gõ → xem bản dịch → <kbd>Tab</kbd> để thay thế</p>
+        </section>
+
+        <details id="api-settings" class="api-settings">
+          <summary><span>OpenAI API key</span><span id="key-badge" class="key-badge">Chưa có key</span></summary>
+          <div class="api-content">
+            <label class="select-label" for="openai-key">API key của bạn</label>
+            <input id="openai-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-…" aria-describedby="key-status">
+            <div class="key-help"><p id="key-status">Key được lưu trong Chrome trên máy này.</p><button id="remove-key" class="text-button" type="button" hidden>Xóa key</button></div>
+          </div>
+        </details>
+
+        <p id="toast-msg" class="toast" role="status" aria-live="polite" hidden></p>
+        <button id="save-btn" class="save-button" type="submit" disabled>Lưu cài đặt</button>
+      </form>
+    </main>
+    <script src="../shared/settings.js"></script>
+    <script src="../shared/dom.js"></script>
+    <script src="../shared/platforms.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
